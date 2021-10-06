@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import '../assets/styles/app.css';
 import styled from 'styled-components';
+import cryptoRandomString from 'crypto-random-string';
 
 // 2907 x 3460;
 import mapSource from '../assets/images/map.png';
@@ -106,7 +107,9 @@ function App() {
         onMouseDown={handleMoveMap}
         onContextMenu={handleCreateMarker}
         />
-        { isVisibleMarker ? markers.map((marker) => (<Marker positionX={marker.x} positionY={marker.y} />)) : null }
+        <ul>
+        { isVisibleMarker ? markers.map((marker, idx) => (<Marker key={cryptoRandomString({length: 12, type: 'base64'})} positionX={marker.x} positionY={marker.y} />)) : null }
+        </ul>
       </Map>
     </Container>
   );
