@@ -29,20 +29,13 @@ function App() {
   const [markers, setMarkers] = useState([]);
   const [isVisibleMarker, setIsVisibleMarker] = useState(true);
 
-  const moveMarker = (moveX, moveY, MAX_X, MAX_Y) => {
-    const MIN_X = 0;
-    const MIN_Y = 0;
-
-    let x = moveX > MIN_X ? MIN_X : (moveX < MAX_X ? MAX_X : moveX);
-    let y = moveY > MIN_Y ? MIN_Y : (moveY < MAX_Y ? MAX_Y : moveY);
-
+  const moveMarker = (x, y) => {
     const newMarkers = markers.map((marker) => {
       return {
         x: marker.x + x,
         y: marker.y + y,
       }
     });
-
     setMarkers(newMarkers);
   }
 
@@ -52,6 +45,8 @@ function App() {
       setIsVisibleMarker(false);
       const map = event.target;
       const mapRect = map.getBoundingClientRect();
+      const 움직이기전X = mapRect.x;
+      const 움직이기전Y = mapRect.y;
 
       // 이미지에서 내가 클릭한 위치
       let shiftX = event.clientX - mapRect.left;
@@ -66,10 +61,13 @@ function App() {
         const MIN_X = 0;
         const MAX_X = -mapRect.width + 1024;
         const MIN_Y = 0;
-        const MAX_Y = -mapRect.width + 768;
+        const MAX_Y = -mapRect.height + 768;
 
-        map.style.left = `${moveX > MIN_X ? MIN_X : (moveX < MAX_X ? MAX_X : moveX)}px`;
-        map.style.top = `${moveY > MIN_Y ? MIN_Y : (moveY < MAX_Y ? MAX_Y : moveY)}px`;
+        let x = moveX > MIN_X ? MIN_X : (moveX < MAX_X ? MAX_X : moveX);
+        let y = moveY > MIN_Y ? MIN_Y : (moveY < MAX_Y ? MAX_Y : moveY);
+
+        map.style.left = `${x}px`;
+        map.style.top = `${y}px`;
       }
 
       // 마우스 무브가 되었을때 실행되는 콜백함수
@@ -78,7 +76,11 @@ function App() {
       }
 
       // 마우스버튼을 땠을때 실행되는 콜백함수
-      const handleDropMap = () => {
+      const handleDropMap = (event) => {
+        const mapRect = map.getBoundingClientRect();
+        const 움직인후X = mapRect.x;
+        const 움직인후Y = mapRect.y;
+        moveMarker(움직인후X - 움직이기전X, 움직인후Y - 움직이기전Y);
         setIsVisibleMarker(true);
         document.body.removeEventListener('mousemove', handleMoveMap);
         document.body.removeEventListener('mouseup', handleDropMap);
@@ -92,7 +94,6 @@ function App() {
   // 우클릭
   const handleCreateMarker = (event) => {
     event.preventDefault();
-    console.log(event)
     setMarkers([...markers, {x: event.clientX, y: event.clientY}]);
   }
 

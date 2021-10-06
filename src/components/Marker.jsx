@@ -7,9 +7,9 @@ const Marker = ({ positionX, positionY }) => {
   const Marker = styled.div`
     list-style: none;
     position: absolute;
-    left: 0;
-    top: 0;
-    transform: translate(${positionX - 48}px, ${positionY - 132}px);
+    transform: translate(-50%, -80%);
+    left: ${positionX}px;
+    top: ${positionY}px;
   `;
 
   return (
