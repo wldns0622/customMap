@@ -7,8 +7,8 @@
 ## 프로젝트 시작 방법
 
 1. clone을 받는다.
-2. `npm install` or `yarn install`
-3. `npm start` or `yarn start`
+2. `npm install`
+3. `npm start`
 
 ## 기능 개발 순서
 
