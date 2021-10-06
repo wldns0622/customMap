@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import '../assets/styles/app.css';
 import styled from 'styled-components';
 
 // 2907 x 3460;
 import mapSource from '../assets/images/map.png';
-import { useState } from 'react';
+import resetSource from '../assets/images/reset.png'
 
 import Marker from '../components/Marker';
+import Button from '../components/Button';
 
 const Container = styled.section`
   height: 100vh;
@@ -25,14 +27,33 @@ const Map = styled.div`
 
 function App() {
   const [markers, setMarkers] = useState([]);
+  const [isVisibleMarker, setIsVisibleMarker] = useState(true);
+
+  const moveMarker = (moveX, moveY, MAX_X, MAX_Y) => {
+    const MIN_X = 0;
+    const MIN_Y = 0;
+
+    let x = moveX > MIN_X ? MIN_X : (moveX < MAX_X ? MAX_X : moveX);
+    let y = moveY > MIN_Y ? MIN_Y : (moveY < MAX_Y ? MAX_Y : moveY);
+
+    const newMarkers = markers.map((marker) => {
+      return {
+        x: marker.x + x,
+        y: marker.y + y,
+      }
+    });
+
+    setMarkers(newMarkers);
+  }
 
   // 좌클릭
   const handleMoveMap = (event) => {
     if(!event.button){
+      setIsVisibleMarker(false);
       const map = event.target;
       const mapRect = map.getBoundingClientRect();
 
-      // 이미지에서 내가 클린한 위치
+      // 이미지에서 내가 클릭한 위치
       let shiftX = event.clientX - mapRect.left;
       let shiftY = event.clientY - mapRect.top;
 
@@ -47,31 +68,8 @@ function App() {
         const MIN_Y = 0;
         const MAX_Y = -mapRect.width + 768;
 
-        // map.style.left = `${moveX > MIN_X ? MIN_X : (moveX < MAX_X ? MAX_X : moveX)}px`;
-        // map.style.top = `${moveY > MIN_Y ? MIN_Y : (moveY < MAX_Y ? MAX_Y : moveY)}px`;
-
-        if(moveX > MIN_X) {
-          map.style.left = `${MIN_X}px`;
-        } else if(moveX < MAX_X) {
-          map.style.left = `${MAX_X}px`;
-        } else {
-          map.style.left = `${moveX}px`;
-        }
-
-        if(moveY > MIN_Y) {
-          map.style.top = `${MIN_Y}px`;
-        } else if(moveY < MAX_Y) {
-          map.style.top = `${MAX_Y}px`;
-        } else {
-          map.style.top = `${moveY}px`;
-        }
-
-        //마커 이동
-        // let changePositionMarkers = markers.map((marker) => {
-        //   return {x: marker.x + moveX, y: marker.y + moveY}
-        // });
-
-        // setMarkers(changePositionMarkers);
+        map.style.left = `${moveX > MIN_X ? MIN_X : (moveX < MAX_X ? MAX_X : moveX)}px`;
+        map.style.top = `${moveY > MIN_Y ? MIN_Y : (moveY < MAX_Y ? MAX_Y : moveY)}px`;
       }
 
       // 마우스 무브가 되었을때 실행되는 콜백함수
@@ -79,8 +77,9 @@ function App() {
         positionChange(event.pageX, event.pageY);
       }
 
-      // 마우스버튼을 땠을때 실행되는 콜밸함수
+      // 마우스버튼을 땠을때 실행되는 콜백함수
       const handleDropMap = () => {
+        setIsVisibleMarker(true);
         document.body.removeEventListener('mousemove', handleMoveMap);
         document.body.removeEventListener('mouseup', handleDropMap);
       }
@@ -100,15 +99,14 @@ function App() {
   return (
     <Container>
       <Map>
+        <Button title={resetSource} setMarkers={setMarkers} />
         <img src={mapSource} alt="지도" 
         onDragStart={(event)=> event.preventDefault()} 
         onMouseDown={handleMoveMap}
         onContextMenu={handleCreateMarker}
         />
+        { isVisibleMarker ? markers.map((marker) => (<Marker positionX={marker.x} positionY={marker.y} />)) : null }
       </Map>
-      <ul>
-        { markers.map((marker) => (<Marker positionX={marker.x} positionY={marker.y} />)) }
-      </ul>
     </Container>
   );
 }
